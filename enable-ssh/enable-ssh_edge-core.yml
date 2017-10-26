@@ -1,0 +1,35 @@
+---
+- name enable ssh
+  hosts Cisco
+  gather_facts false
+  connection local
+
+  tasks
+
+      - name check ssh
+        command  usrbinpython rootansiblecheck_port.py {{ansible_host}}  22
+        register ssh_listen
+        ignore_errors True
+
+
+      - name enable_ssh
+        telnet
+          pause 3
+          user username
+          password passwd
+          login_prompt Username 
+          prompts
+            - [#]
+          command
+            - terminal length 0
+            - enable
+            - password
+            - conf t
+            - ip domain-name local.domain
+            - crypto key generate rsa
+            - 1024
+            - ip ssh version 2
+            - exit
+            - wr mem
+            - exit
+        when ssh_listenfailed
